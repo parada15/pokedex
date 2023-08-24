@@ -118,6 +118,29 @@ const BuscarHabilidadesPokemon = function(pokemon){
     });
 }
 
+//con esta funcion se busca las estadisticas del pokemon por medio de su nombre, devuelve una promesa
+const MostrarEstadisticasPokemon = function(pokemonName) {
+    return new Promise(function(resolve, reject) {
+        const url = `https://pokeapi.co/api/v2/pokemon/${pokemonName}`;
+        fetch(url)
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(datos) {
+            const estadisticas = datos.stats.map(stat => {
+                return {
+                    nombre: stat.stat.name,
+                    valor: stat.base_stat
+                };
+            });
+            resolve(estadisticas);
+        })
+        .catch(function(err) {
+            reject(err);
+        });
+    });
+}
+
 
 
 //Este es el constructor principal de los pokemon, la cual es una funcion asincrona, aqui se hace el llamado
@@ -274,7 +297,6 @@ const crearPokedex = function(num){
 
             //////Caracteristicas del pokemon//////////////
 
-            
     // Obtener especie
     const especie = await BuscarEspeciePokemon(pokemon.indexpoke);
     const especieNombre = especie.genera.find(genus => genus.language.name === 'en').genus;
@@ -296,19 +318,25 @@ const crearPokedex = function(num){
     const habilidadesData = await BuscarHabilidadesPokemon(pokemon.nombre.toLowerCase());
     const habilidades = habilidadesData.abilities.map(ability => ability.ability.name);
 
+                // Obtener estadísticas
+                const estadisticasData = await MostrarEstadisticasPokemon(pokemon.nombre.toLowerCase());
+                const stats = estadisticasData.map(stat => `${stat.nombre}: ${stat.valor}`).join('<br>');
+            
+
 
             //mostrará en el expander los datos del pokemon
             
             document.querySelector(`#pokemon-${index} .card__expander`).innerHTML = `
             <div>genus: ${especieNombre}</div>
-            <div>Height: ${altura} cm</div>
-            <div>weight: ${peso} kg</div>
+            <div>Height: ${(altura*10)} cm</div>
+            <div>weight: ${peso/10} kg</div>
             <div>types : ${tipo}</div>
             <div>abilities: ${habilidades}</div>
+            <div>${stats}</div>
         `;
 
         })
     }
 }
-crearPokedex(30);
+crearPokedex(151);
 /****************************************/
