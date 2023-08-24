@@ -32,7 +32,7 @@ const BuscarInfoPokemon = function(pokemon){
     });
 }
 
-///////////////////////////EXTRAS AL CODIGO///////////////////////////
+//con esta funcion se busca la especie del pokemon por medio de su numero en la pokedex, devuelve una promesa
 
 const BuscarEspeciePokemon = function(N_pokedex){
     return new Promise(function(resolve,reject){
@@ -50,6 +50,7 @@ const BuscarEspeciePokemon = function(N_pokedex){
     });
 }
 
+//con esta funcion se busca la altura del pokemon por medio de su nombre, devuelve una promesa
 const BuscarAlturaPokemon = function(pokemon){
     return new Promise(function(resolve,reject){
         const url = "https://pokeapi.co/api/v2/pokemon/"+pokemon;
@@ -66,6 +67,7 @@ const BuscarAlturaPokemon = function(pokemon){
     });
 }
 
+//con esta funcion se busca el peso del pokemon por medio de su nombre, devuelve una promesa
 const BuscarPesoPokemon = function(pokemon){
     return new Promise(function(resolve,reject){
         const url = "https://pokeapi.co/api/v2/pokemon/"+pokemon;
@@ -82,6 +84,7 @@ const BuscarPesoPokemon = function(pokemon){
     });
 }
 
+//con esta funcion se busca el tipo del pokemon por medio de su nombre, devuelve una promesa
 const BuscarTipoPokemon = function(pokemon){
     return new Promise(function(resolve,reject){
         const url = "https://pokeapi.co/api/v2/pokemon/"+pokemon;
@@ -98,6 +101,7 @@ const BuscarTipoPokemon = function(pokemon){
     });
 }
 
+//con esta funcion se busca las habilidades del pokemon por medio de su nombre, devuelve una promesa
 const BuscarHabilidadesPokemon = function(pokemon){
     return new Promise(function(resolve,reject){
         const url = "https://pokeapi.co/api/v2/pokemon/"+pokemon;
@@ -115,7 +119,6 @@ const BuscarHabilidadesPokemon = function(pokemon){
 }
 
 
-///////////////////////////EXTRAS AL CODIGO///////////////////////////
 
 //Este es el constructor principal de los pokemon, la cual es una funcion asincrona, aqui se hace el llamado
 //de las funciones para buscarPokemon y BuscarInfoPokemon, la funcion devuelve los datos del pokemon
@@ -207,6 +210,7 @@ const crearPokedex = function(num){
 
         //Se crea un li para agregar a la lista
         const nuevoLi = document.createElement("li");
+        nuevoLi.id = "pokemon-"+index;
         nuevoLi.className = "card [ is-collapsed ]";
         lista.appendChild(nuevoLi);
 
@@ -245,12 +249,7 @@ const crearPokedex = function(num){
         nuevoP.id = "Desc"+index;
         nuevoDivInfo.appendChild(nuevoP);
 
-        //agregado
-       // const nuevoh4 = document.createElement("h4");
-        //nuevoh4.id = "alt"+index;
-        //nuevoDivInfo.appendChild(nuevoh4);
-        //agregado
-
+       
         const nuevoDivInfoPlus = document.createElement("div");
         nuevoDivInfoPlus.className = "card__expander";
         nuevoDivInfoPlus.innerText = "Expander";
@@ -265,56 +264,51 @@ const crearPokedex = function(num){
             let idpoke = document.getElementById("N_pok"+index);
             let nombre = document.getElementById("Poke"+index);
             let descripcion = document.getElementById("Desc"+index);
-           // let tipo2 = document.getElementById("alt"+index);//agregado
             let imagen = document.getElementById("Sprite"+index);
            
             idpoke.innerText = "#"+pokemon.indexpoke;
             nombre.innerText = pokemon.nombre;
             descripcion.innerText = pokemon.descripcion;
-           // tipo2.innerText = pokemon.tipo2;///agregado
             imagen.src = pokemon.sprite;
             nuevaAncla.style.backgroundColor = asignarColor(pokemon.tipo1);
 
-            //////extras de codigo//////////////
+            //////Caracteristicas del pokemon//////////////
 
             
     // Obtener especie
     const especie = await BuscarEspeciePokemon(pokemon.indexpoke);
-    const especieNombre = especie.genera[0].genus;
-    // Actualizar DOM con la especie
-    // ...
-
+    const especieNombre = especie.genera.find(genus => genus.language.name === 'en').genus;
+    
     // Obtener altura
     const alturaData = await BuscarAlturaPokemon(pokemon.nombre.toLowerCase());
     const altura = alturaData.height;
-    // Actualizar DOM con la altura
-    // ...
-    const nuevooP = document.createElement("p");
-    nuevooP.id = "altura"+index;
-    nuevoDivInfo.appendChild(nuevooP);
 
     // Obtener peso
     const pesoData = await BuscarPesoPokemon(pokemon.nombre.toLowerCase());
     const peso = pesoData.weight;
-    // Actualizar DOM con el peso
-    // ...
+   
 
     // Obtener tipo
     const tipoData = await BuscarTipoPokemon(pokemon.nombre.toLowerCase());
     const tipo = tipoData.types[0].type.name;
-    // Actualizar DOM con el tipo
-    // ...
-
+   
     // Obtener habilidades
     const habilidadesData = await BuscarHabilidadesPokemon(pokemon.nombre.toLowerCase());
     const habilidades = habilidadesData.abilities.map(ability => ability.ability.name);
-    // Actualizar DOM con las habilidades
-    // ...
 
-            /////////////extras de codigo////////////
+
+            //mostrará en el expander los datos del pokemon
+            
+            document.querySelector(`#pokemon-${index} .card__expander`).innerHTML = `
+            <div>genus: ${especieNombre}</div>
+            <div>Height: ${altura} cm</div>
+            <div>weight: ${peso} kg</div>
+            <div>types : ${tipo}</div>
+            <div>abilities: ${habilidades}</div>
+        `;
 
         })
     }
 }
-crearPokedex(14);
+crearPokedex(30);
 /****************************************/
